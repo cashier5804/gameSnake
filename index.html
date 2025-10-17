@@ -46,8 +46,8 @@
             }
             $("#game").append(tr);
         }
-        i = Math.floor(Math.random() * 16)*3;
-        j = Math.floor(Math.random() * 16)*3;
+        i = Math.floor(Math.random() * 16)+3;
+        j = Math.floor(Math.random() * 16)+3;
         snake.list.push({i: i, j: j});
         $("."+i+"-"+j).addClass('green');
         generateFood();

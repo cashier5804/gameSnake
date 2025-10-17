@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ran san moi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        table{
+            margin: auto;
+            border-spacing: 0;
+            border-collapse: collapse;
+            border: 1px solid #ccc;
+            background: black;
+        }
+        tr{
+
+        }
+        tr td{
+            height: 20px;
+            width: 20px;
+        }
+        .green{
+            background: green;
+        }
+        .red{
+            background: red;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<table id = "game"></table>
+</body>
+</html>
+<script>
+    let gameInterval;
+    let food = null;
+    const snake = {list: [], way: 3};
+    function init(){
+        for(let i=0;i<20;i++){
+            const tr = $('<tr>');
+            for (let j = 0; j < 20; j++) {
+                const td = $('<td>');
+                td.addClass(i+"-"+j);
+                tr.append(td);
+            }
+            $("#game").append(tr);
+        }
+        i = Math.floor(Math.random() * 16)*3;
+        j = Math.floor(Math.random() * 16)*3;
+        snake.list.push({i: i, j: j});
+        $("."+i+"-"+j).addClass('green');
+        generateFood();
+    }
+    function generateFood(){
+        let foodI, foodJ;
+        while(true){
+            foodI = Math.floor(Math.random() * 20);
+            foodJ = Math.floor(Math.random() * 20);
+            let isSnake = false;
+            for (const data of snake.list) {
+                if(data.i === foodI && data.j === foodJ){
+                    isSnake = true;
+                    break;
+                }
+            }
+            if(!isSnake){
+                food = {i: foodI, j: foodJ};
+                $("."+foodI+"-"+foodJ).addClass('red');
+                return;
+            }
+        }
+    }
+    function move(){
+        const head = snake.list[0];
+        let newi = head.i;
+        let newj = head.j;
+
+        switch(snake.way){
+            case 0:
+                newi--;
+                break;
+            case 1:
+                newj++;
+                break;
+            case 2:
+                newi++;
+                break;
+            default:
+                newj--;
+                break;
+        }
+
+        // if(newi<0){ newi = 19; }
+        // if(newi>19){ newi= 0; }
+        // if(newj<0){ newj = 19; }
+        // if(newj>19){ newj = 0; }
+
+        if(newi<0 || newi > 19 || newj < 0 || newj > 19) {
+            gameOver();
+            return;
+        }
+        for (let k = 1; k < snake.list.length ; k++) {
+            if(snake.list[k].i === newi && snake.list[k].j === newj){
+                gameOver();
+                return;
+            }
+
+        }
+        snake.list.unshift({i: newi, j: newj});
+        let ateFood = (newi===food.i && newj===food.j);
+        if(ateFood){
+            $("."+food.i+"-"+food.j).removeClass('red');
+            generateFood();
+        } else{
+            const tail = snake.list.pop();
+            $("."+tail.i+"-"+tail.j).removeClass('green');}
+        $("."+newi+"-"+newj).addClass('green');
+    }
+    function gameOver(){
+        alert("Game Over!");
+        clearInterval(gameInterval);
+    }
+    $(document).ready(function(){
+        init();
+        gameInterval =setInterval(move, 200);
+        $(document).on('keydown',function(e){
+            e.preventDefault();
+            const key = e.keyCode;
+            const currentWay = snake.way;
+            if (key == 38 && currentWay != 2){
+                snake.way = 0;
+            } else if (key == 39 && currentWay != 3){
+                snake.way = 1;
+            } else if (key == 40 && currentWay != 0){
+                snake.way = 2;
+            } else if (key == 37 && currentWay != 1){
+                snake.way = 3;
+            }
+        })
+    })
+</script>
